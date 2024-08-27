@@ -8,7 +8,7 @@ import { RegistrationService } from '../registration.service'
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { NgxImageCompressService } from 'ngx-image-compress';
 import {eventName} from '../../../../eventEnv'
-import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCarouselConfig, NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-registration',
@@ -18,7 +18,7 @@ import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
 })
 export class RegistrationComponent implements OnInit {
 
-  constructor(private router: Router, private route: ActivatedRoute, private fb: FormBuilder,  private httpClient: HttpClient,private toastr: ToastrService, private ngxUiLoaderService: NgxUiLoaderService, private registrationService: RegistrationService, private imageCompress: NgxImageCompressService, config: NgbCarouselConfig) {
+  constructor(private router: Router, private route: ActivatedRoute, private fb: FormBuilder,  private httpClient: HttpClient,private toastr: ToastrService, private ngxUiLoaderService: NgxUiLoaderService, private registrationService: RegistrationService, private imageCompress: NgxImageCompressService, config: NgbCarouselConfig, private modalService: NgbModal) {
     config.interval = 2000;
     config.keyboard = true;
     config.pauseOnHover = true;
@@ -178,6 +178,9 @@ public dropdownSettingsDistrict: IDropdownSettings = {
     closeDropDownOnSelection:true
   };
 
+  verificationOtp = '';
+  otpVerificationForm: FormGroup | any;
+  otpVerificationFormValidation = false;
 
 
   ngOnInit(): void {
@@ -219,6 +222,12 @@ public dropdownSettingsDistrict: IDropdownSettings = {
         this.toastr.error(error, 'Error')
       }
     );
+
+
+    this.otpVerificationForm = this.fb.group({
+      Otp: [, [Validators.required]]
+    });
+    this.otpVerificationFormValidation = false;
   }
 
   handleFileInput(event) {
@@ -252,9 +261,10 @@ public dropdownSettingsDistrict: IDropdownSettings = {
 
   createAttendeeFormAction() {
     this.createAttendeeFormValidation = true;
-    // if (this.createAttendeeForm.invalid) {
-    //   return;
-    // }
+    var noerror = true;
+    if (this.createAttendeeForm.invalid) {
+      noerror = false;
+    }
     var country = '';
     var state = '';
     var district = '';
@@ -269,31 +279,31 @@ public dropdownSettingsDistrict: IDropdownSettings = {
           this.stateSelectionErr = false;
         }else{
           this.stateSelectionErr = true;
-          return ;
+          noerror = false;
         }
         if(this.districtSelection){
           district = this.districtSelection[0]['item_id'];
           this.districtSelectionErr = false;
         }else{
           this.districtSelectionErr = true;
-          return ;
+          noerror = false;
         }
       }else{
         if(this.countryManual == ''){
           this.countryManualErr = true;
-          return ;
+          noerror = false;
         }else{
           this.countryManualErr = false;
         }
         if(this.stateManual == ''){
           this.stateManualErr = true;
-          return ;
+          noerror = false;
         }else{
           this.stateManualErr = false;
         }
         if(this.districtManual == ''){
           this.districtManualErr = true;
-          return ;
+          noerror = false;
         }else{
           this.districtManualErr = false;
         }
@@ -304,27 +314,43 @@ public dropdownSettingsDistrict: IDropdownSettings = {
       }
     }else{
       this.countrySelectionErr =true;
-      return;
+      noerror = false;
     }
 
     if(this.companySelection == ''){
       this.companySelectionErr =true;
-      return;
+      noerror = false;
+    }
+    else{
+      this.companySelectionErr =false;
     }
 
     if(this.transportationSelection == ''){
       this.transportationSelectionErr =true;
-      return;
+      noerror = false;
+    }
+    else{
+      this.transportationSelectionErr =false;
     }
 
     if(this.arrivalDateSelection == ''){
       this.arrivalDateSelectionErr =true;
-      return;
+      noerror = false;
+    }
+    else{
+      this.arrivalDateSelectionErr =false;
     }
 
     if(this.arrivalTimeSelection == ''){
       this.arrivalTimeSelectionErr =true;
-      return;
+      noerror = false;
+    }
+    else{
+      this.arrivalTimeSelectionErr =false;
+    }
+
+    if(!noerror){
+      return ;
     }
 
     this.ngxUiLoaderService.start();
@@ -334,24 +360,35 @@ public dropdownSettingsDistrict: IDropdownSettings = {
           "name": this.createAttendeeForm.get('Name').value,
           "email": this.createAttendeeForm.get('Email').value,
           "phone": this.createAttendeeForm.get('Phone').value,
-          "address": this.createAttendeeForm.get('Address').value,
+          "address": "",
           "country": country,
           "state": state,
           "district": district,
           "pincode": this.createAttendeeForm.get('Pincode').value,
           "profile_image": data.data,
-          "company_name": this.createAttendeeForm.get('CompanyName').value,
-          "gst": this.createAttendeeForm.get('GSTNumber').value,
-          "event" : eventName
+          "company_name": this.companySelection[0]['item_id'],
+          "gst": "",
+          "event" : eventName,
+          "branch": this.createAttendeeForm.get('Branch').value,
+          "department": this.createAttendeeForm.get('Department').value,
+          "emp_code": this.createAttendeeForm.get('Code').value,
+          "designation": this.createAttendeeForm.get('Designation').value,
+          "am": this.createAttendeeForm.get('AreaManager').value,
+          "rm": this.createAttendeeForm.get('RegionalManager').value,
+          "transportation": this.transportationSelection[0]['item_id'],
+          "arrival_date": this.arrivalDateSelection[0]['item_id'],
+          "arrival_time": this.arrivalTimeSelection[0]['item_id'],
+          "business_head_hod":this.createAttendeeForm.get('BusinessHeadHod').value,
         }
-
         this.registrationService.createAttendee(user_data).subscribe(data => {
           this.toastr.success('New attendee created', 'Success')
           this.resetForm();
           this.ngxUiLoaderService.stop();
+          this.modalService.dismissAll();
         },
           error => {
             this.ngxUiLoaderService.stop();
+            this.modalService.dismissAll();
             this.toastr.error(error, 'Error')
           }
         );
@@ -361,6 +398,7 @@ public dropdownSettingsDistrict: IDropdownSettings = {
       error => {
         this.ngxUiLoaderService.stop();
         this.toastr.error(error, 'Error')
+        this.modalService.dismissAll();
       }
     );
 
@@ -410,6 +448,15 @@ public dropdownSettingsDistrict: IDropdownSettings = {
     this.stateSelectionErr= false;
     this.districtSelection = '';
     this.districtSelectionErr = false;
+    this.companySelection = '';
+    this.companySelectionErr = false;
+    this.transportationSelection = '';
+    this.transportationSelectionErr = false;
+    this.arrivalDateSelection = '';
+    this.arrivalDateSelectionErr = false;
+    this.arrivalTimeSelection = '';
+    this.arrivalTimeSelectionErr = false;
+    this.arrivalTimeArr = []
   }
 
   compressFile(image, fileName) {
@@ -471,6 +518,136 @@ public dropdownSettingsDistrict: IDropdownSettings = {
     onArrivalDateDeSelect(event){
       this.arrivalTimeArr=[];
       this.arrivalTimeSelection = '';
+    }
+
+    sendOtpValidationToWhatsapp(modalName){
+      this.createAttendeeFormValidation = true;
+      var noerror = true;
+      if (this.createAttendeeForm.invalid) {
+        noerror = false;
+      }
+      var country = '';
+      var state = '';
+      var district = '';
+
+      if(this.countrySelection){
+        this.countrySelectionErr =false;
+        var countrysel = this.countrySelection[0]['item_id'];
+        if(countrysel == 'India'){
+          country = 'India';
+          if(this.stateSelection){
+            state = this.stateSelection[0]['item_id'];
+            this.stateSelectionErr = false;
+          }else{
+            this.stateSelectionErr = true;
+            noerror = false;
+          }
+          if(this.districtSelection){
+            district = this.districtSelection[0]['item_id'];
+            this.districtSelectionErr = false;
+          }else{
+            this.districtSelectionErr = true;
+            noerror = false;
+          }
+        }else{
+          if(this.countryManual == ''){
+            this.countryManualErr = true;
+            noerror = false;
+          }else{
+            this.countryManualErr = false;
+          }
+          if(this.stateManual == ''){
+            this.stateManualErr = true;
+            noerror = false;
+          }else{
+            this.stateManualErr = false;
+          }
+          if(this.districtManual == ''){
+            this.districtManualErr = true;
+            noerror = false;
+          }else{
+            this.districtManualErr = false;
+          }
+
+          country = this.countryManual;
+          state = this.stateManual;
+          district = this.districtManual;
+        }
+      }else{
+        this.countrySelectionErr =true;
+        noerror = false;
+      }
+
+      if(this.companySelection == ''){
+        this.companySelectionErr =true;
+        noerror = false;
+      }
+      else{
+        this.companySelectionErr =false;
+      }
+
+      if(this.transportationSelection == ''){
+        this.transportationSelectionErr =true;
+        noerror = false;
+      }
+      else{
+        this.transportationSelectionErr =false;
+      }
+
+      if(this.arrivalDateSelection == ''){
+        this.arrivalDateSelectionErr =true;
+        noerror = false;
+      }
+      else{
+        this.arrivalDateSelectionErr =false;
+      }
+
+      if(this.arrivalTimeSelection == ''){
+        this.arrivalTimeSelectionErr =true;
+        noerror = false;
+      }
+      else{
+        this.arrivalTimeSelectionErr =false;
+      }
+
+      if(!noerror){
+        return ;
+      }
+
+      this.ngxUiLoaderService.start();
+      var reqparam = {
+        phone:this.createAttendeeForm.get('Phone').value,
+        email:this.createAttendeeForm.get('Email').value,
+        event:eventName
+      }
+      this.registrationService.checkAndSendWhatsappNumberOtp(reqparam).subscribe(data => {
+        this.ngxUiLoaderService.stop();
+        if(data.message == 'Success'){
+          this.verificationOtp = data.data
+          this.modalService.open(modalName, { ariaLabelledBy: 'modal-basic-title', size: 'dialog-centered', backdrop: 'static' });
+        }else{
+          this.toastr.error('Something went wrong!', 'Error')
+        }
+      },
+        error => {
+          this.ngxUiLoaderService.stop();
+          this.toastr.error(error, 'Error')
+        }
+      );
+    }
+
+    validateOtpAndRegister(){
+      console.log('test');
+      this.otpVerificationFormValidation = true;
+      if (this.otpVerificationForm.invalid) {
+        return;
+      }
+      if(this.verificationOtp == this.otpVerificationForm.get('Otp').value){
+        this.createAttendeeFormAction();
+      }
+      else{
+        this.toastr.error('Invalid OTP', 'Error')
+      }
     }
 
 }

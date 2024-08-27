@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { map, Observable, pipe, throwError, of } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
-import {upload_profile_photo, create_attendee} from 'src/_api_list';
+import {upload_profile_photo, create_attendee, check_and_send_whatsapp_number_otp} from 'src/_api_list';
 import { LoginService } from '../login/login.service';
 import { Router, ActivatedRoute } from "@angular/router";
 import { ToastrService } from 'ngx-toastr';
@@ -47,5 +47,12 @@ export class RegistrationService {
   public getstatedistrictJSON(): Observable<any> {
     return this.httpClient.get("./assets/statedistrict.json");
   }
+
+  checkAndSendWhatsappNumberOtp(reqparams): Observable<any>{
+    let data =  this.httpClient.post<any>(check_and_send_whatsapp_number_otp, reqparams,{ headers: new  HttpHeaders({ 'Content-Type': 'application/json' }) },).pipe(catchError(this.handleError));
+    return data;
+  }
+
+
 
 }

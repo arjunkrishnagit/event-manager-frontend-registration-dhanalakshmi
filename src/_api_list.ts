@@ -12,3 +12,4 @@ export const create_attendee= base_url+'/create_attendee';
 export const get_attendee_checkin_details= base_url+'/get_attendee_checkin_details';
 export const update_profile_photo= base_url+'/update_profile_photo';
 export const edit_attendee= base_url+'/edit_attendee';
+export const check_and_send_whatsapp_number_otp= base_url+'/check_and_send_whatsapp_number_otp';

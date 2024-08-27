@@ -62,14 +62,14 @@
           <form class="form-body d-flex" [formGroup]="createAttendeeForm">
             <div class="row w-100">
               <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
-                <label for="Name" class="form-label">Employee Name</label>
+                <label for="Name" class="form-label">Name</label>
                 <input type="text" class="form-control ps-3 form-input-cstm" id="Name"
-                  placeholder="Enter Employee Name" formControlName="Name"
+                  placeholder="Enter Name" formControlName="Name"
                   [ngClass]="{'ng-invalid-class':(createAttendeeFormValidation && createAttendeeForm.controls['Name'].invalid)}">
                 <span
                   *ngIf="createAttendeeFormValidation && createAttendeeForm.controls['Name'].invalid && createAttendeeForm.controls['Name'].errors.required"
                   class="invalidate-text">
-                  Please enter employee name
+                  Please enter name
                 </span>
               </div>
 
@@ -115,19 +115,19 @@
               </div>
 
               <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
-                <label for="Phone" class="form-label">Phone</label>
+                <label for="Phone" class="form-label">Whatsapp Number</label>
                 <input type="text" class="form-control ps-3 form-input-cstm" id="Phone"
-                  placeholder="Enter Phone" formControlName="Phone"
+                  placeholder="Enter Whatsapp Number For Verification" formControlName="Phone"
                   [ngClass]="{'ng-invalid-class':(createAttendeeFormValidation && createAttendeeForm.controls['Phone'].invalid)}">
                 <span
                   *ngIf="createAttendeeFormValidation && createAttendeeForm.controls['Phone'].invalid && createAttendeeForm.controls['Phone'].errors.required"
                   class="invalidate-text">
-                  Please enter phone
+                  Please enter whatsapp number
                 </span>
                 <span
                   *ngIf="createAttendeeFormValidation && createAttendeeForm.controls['Phone'].invalid && (createAttendeeForm.controls['Phone'].errors.pattern || createAttendeeForm.controls['Phone'].errors.minlength || createAttendeeForm.controls['Phone'].errors.maxlength)"
                   class="invalidate-text">
-                  Please enter a valid phone
+                  Please enter a valid whatsapp number
                 </span>
               </div>
 
@@ -386,7 +386,8 @@
                 </span>
               </div>
               <div class="col-12 text-center">
-                <button type="submit" class="btn btn-primary login-btn mt-4" (click)="createAttendeeFormAction()">
+                <!-- <button type="submit" class="btn btn-primary login-btn mt-4" (click)="createAttendeeFormAction()"> -->
+                <button type="submit" class="btn btn-primary login-btn mt-4" (click)="sendOtpValidationToWhatsapp(otpVerificationModal)">
                   <span>Register</span>
                 </button>
               </div>
@@ -402,3 +403,34 @@
 
 </div>
 <!--end wrapper-->
+
+<!-- priint modal -->
+<ng-template #otpVerificationModal let-modal>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="w-100 text-center mb-0 modal-title">Otp verification</h5>
+    </div>
+    <div class="modal-body">
+      <div class="reg-modal-form py-4 container">
+        <form class="form-body d-flex" [formGroup]="otpVerificationForm">
+          <div class="row w-100">
+            <div class="col-12 mb-2">
+              <label for="Otp" class="form-label">Otp</label>
+              <input type="text" [(ngModel)]="Otp" class="form-control ps-3 form-input-cstm" id="Otp"
+                placeholder="Enter Otp" formControlName="Otp"
+                [ngClass]="{'ng-invalid-class':(otpVerificationForm && otpVerificationForm.controls['Otp'].invalid)}">
+              <span
+                *ngIf="otpVerificationFormValidation && otpVerificationForm.controls['Otp'].invalid && otpVerificationForm.controls['Otp'].errors.required"
+                class="invalidate-text">
+                Please enter otp
+              </span>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-footer justify-content-center">
+      <button type="button" class="btn modal-yes-btn px-4" (click)="validateOtpAndRegister()">Submit</button>
+    </div>
+  </div>
+</ng-template>
