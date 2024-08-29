@@ -190,7 +190,7 @@ public dropdownSettingsDistrict: IDropdownSettings = {
     });
 
     this.createAttendeeForm = this.fb.group({
-      Name: [, [Validators.required]],
+      Name: [, [Validators.required, Validators.maxLength(50)]],
       Code: [, [Validators.required]],
       Designation: [, [Validators.required]],
       Phone: [, [Validators.required, Validators.minLength(10),Validators.pattern("^[0-9]*$"), Validators.maxLength(10)]],

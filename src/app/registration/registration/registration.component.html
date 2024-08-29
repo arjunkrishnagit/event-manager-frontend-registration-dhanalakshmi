@@ -71,6 +71,11 @@
                   class="invalidate-text">
                   Please enter name
                 </span>
+                <span
+                  *ngIf="createAttendeeFormValidation && createAttendeeForm.controls['Name'].invalid && createAttendeeForm.controls['Name'].errors.maxlength"
+                  class="invalidate-text">
+                  Maximum 50 characters allowed
+                </span>
               </div>
 
               <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
@@ -98,19 +103,19 @@
               </div>
 
               <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
-                <label for="Email" class="form-label">Email</label>
+                <label for="Email" class="form-label">Personal Email</label>
                 <input type="text" class="form-control ps-3 form-input-cstm" id="Email"
-                  placeholder="Enter Email" formControlName="Email"
+                  placeholder="Enter Your Personal Email" formControlName="Email"
                   [ngClass]="{'ng-invalid-class':(createAttendeeFormValidation && createAttendeeForm.controls['Email'].invalid)}">
                 <span
                   *ngIf="createAttendeeFormValidation && createAttendeeForm.controls['Email'].invalid && createAttendeeForm.controls['Email'].errors.required"
                   class="invalidate-text">
-                  Please enter email
+                  Please enter personal email
                 </span>
                 <span
                   *ngIf="createAttendeeFormValidation && createAttendeeForm.controls['Email'].invalid && createAttendeeForm.controls['Email'].errors.pattern"
                   class="invalidate-text">
-                  Please enter email in proper format
+                  Please enter personal email in proper format
                 </span>
               </div>
 
