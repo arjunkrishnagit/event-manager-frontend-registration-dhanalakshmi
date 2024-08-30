@@ -7,7 +7,7 @@ import { NgxUiLoaderService } from "ngx-ui-loader";
 import { RegistrationService } from '../registration.service'
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { NgxImageCompressService } from 'ngx-image-compress';
-import {eventName} from '../../../../eventEnv'
+import {eventName, lon, lat, caption} from '../../../../eventEnv'
 import { NgbCarouselConfig, NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -379,6 +379,9 @@ public dropdownSettingsDistrict: IDropdownSettings = {
           "arrival_date": this.arrivalDateSelection[0]['item_id'],
           "arrival_time": this.arrivalTimeSelection[0]['item_id'],
           "business_head_hod":this.createAttendeeForm.get('BusinessHeadHod').value,
+          "lat" : lat,
+          "lon" : lon,
+          "caption" : caption,
         }
         this.registrationService.createAttendee(user_data).subscribe(data => {
           this.toastr.success('New attendee created', 'Success')
